@@ -1,0 +1,204 @@
+<div class="content">
+  <div>
+    <h3>Tiempo transcurrido desde el último dato: {{ getFormattedElapsedTime() }}</h3>
+  </div>
+ 
+  
+  <div class="comparison-info">
+    <h3 style="color:black">Comparación de Condiciones</h3>
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Condición</th>
+          <th>Valor Óptimo</th>
+          <th>Valor Actual</th>
+          <th>Recomendación</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Temperatura</td>
+          <td>18-24 °C</td>
+          <td>{{ lastCollectedData?.temperature }}</td>
+          <td>{{ conditionStatus.temperature.message }}</td>
+        </tr>
+        <tr>
+          <td>Humedad</td>
+          <td>60-80 %</td>
+          <td>{{ lastCollectedData?.humidity }}</td>
+          <td>{{ conditionStatus.humidity.message }}</td>
+        </tr>
+        <tr>
+          <td>Presión</td>
+          <td>1010-1020 hPa</td>
+          <td>{{ lastCollectedData?.pressure }}</td>
+          <td>{{ conditionStatus.pressure.message }}</td>
+        </tr>
+        <tr>
+          <td>Calidad del Aire</td>
+          <td>≤ 15</td>
+          <td>{{ lastCollectedData?.airQuality }}</td>
+          <td>{{ conditionStatus.airQuality.message }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <a *ngIf="recommendations && recommendations.length > 0">
+      <strong>Las condiciones actuales son:</strong>
+      <ul>
+        <li *ngFor="let rec of recommendations" style="color: black;">{{ rec }}</li>
+      </ul>
+    </a>
+
+    <p *ngIf="!recommendations || recommendations.length === 0" style="color: black">
+      Las condiciones actuales son óptimas para los cultivos.
+    </p>
+  </div>
+
+  <div>
+    <h1 style="text-align: center; color: white; font-weight: 700;">
+      Datos obtenidos para el cultivo de zanahoria
+    </h1>
+  </div>
+
+  <div class="comparison-info">
+    <div>
+      <label for="itemsPerPage">Mostrar:</label>
+      <select id="itemsPerPage" [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange()">
+        <option *ngFor="let option of pageOptions" [value]="option">{{ option }}</option>
+      </select>
+    </div>
+
+    <button (click)="getCollectedData()" style="    border: none;
+    color: white;
+    background: #ee2d21;
+    width: 10%;
+    border-radius: 45px;
+    margin-top: 1%;">Recargar</button>
+
+    <div *ngIf="collectedDataList && collectedDataList.length > 0">
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Temperature</th>
+            <th>Humidity</th>
+            <th>Pressure</th>
+            <th>Air Quality</th>
+            <th>Device ID</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of paginatedDataList">
+            <td>{{ data.id }}</td>
+            <td>{{ data.date }}</td>
+            <td>{{ data.time }}</td>
+            <td>{{ data.temperature }}</td>
+            <td>{{ data.humidity }}</td>
+            <td>{{ data.pressure }}</td>
+            <td>{{ data.airQuality }}</td>
+            <td>{{ getDeviceName(data.dataCollectionDeviceId) }}</td>
+
+
+          </tr>
+        </tbody>
+      </table>
+
+      <div>
+        <button (click)="prevPage()" [disabled]="currentPage === 1">Anterior</button>
+      
+        <!-- Paginación numérica -->
+        <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+          <button (click)="goToPage(i + 1)" [class.active]="currentPage === i + 1">{{ i + 1 }}</button>
+        </ng-container>
+      
+        <button (click)="nextPage()" [disabled]="currentPage === totalPages">Siguiente</button>
+      </div>
+    </div>
+
+    <div *ngIf="!collectedDataList || collectedDataList.length === 0">
+      <p>No data available.</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .comparison-info {
+    margin: 20px 0;
+    background-color: #e0f7fa;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    color: #006064;
+  }
+
+  .styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 18px;
+    text-align: left;
+    background-color: #fff;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .styled-table thead tr {
+    background-color: #009879;
+    color: #ffffff;
+    text-align: left;
+  }
+
+  .styled-table th,
+  .styled-table td {
+    padding: 12px 15px;
+    border: 1px solid #dddddd;
+  }
+
+  .styled-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+  }
+
+  .styled-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+  }
+
+  .styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid #009879;
+  }
+
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 16px;
+    text-align: left;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .comparison-table th,
+  .comparison-table td {
+    padding: 10px;
+    border: 1px solid #dddddd;
+  }
+
+  .comparison-table thead tr {
+    background-color: #009879;
+    color: #ffffff;
+  }
+
+  .comparison-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+  }
+
+  .pagination button {
+    margin: 0 5px;
+  }
+
+  .active {
+    background-color: #009879;
+    color: white;
+  }
+</style>

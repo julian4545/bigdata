@@ -1,0 +1,239 @@
+<div class="content">
+  <div>
+    <h2>Dispositivos de Recolección de Datos</h2>
+    <button class="btn btn-primary" (click)="openCreateModal()">Crear Dispositivo</button>
+
+    <table class="comparison-table">
+
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Usuario</th> <!-- Cambia "User ID" por "Usuario" -->
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let device of devices">
+          <td>{{ device.id }}</td>
+          <td>{{ device.name }}</td>
+          <td>{{ device.description }}</td>
+          <td>{{ getUserFullName(device.userId) }}</td> <!-- Usar la función para mostrar el nombre -->
+          <td>
+            <button class="btn btn-success" (click)="openEditModal(device)">Editar</button>
+            <button class="btn btn-danger" (click)="confirmDelete(device.id)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+ <div>
+  <h1 style="">
+    ver datos recolectados de otras maquinas
+  </h1>
+ </div>
+
+
+ <div style="background: white;">
+  <div class="container mt-5">
+    <div class="form-group">
+      <label for="deviceSelect" class="form-label" style="    font-size: 20px;
+    margin-top: 5%;">Selecciona un dispositivo:</label>
+      <select [(ngModel)]="selectedDeviceId" class="form-select">
+        <option *ngFor="let device of devices" [value]="device.id">{{ device.name }}</option>
+      </select>
+    </div>
+    <div class="mt-3">
+      <button class="btn btn-primary" (click)="loadCollectedData()">Cargar</button> 
+    </div>
+  </div>
+  
+  
+  <table class="comparison-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Temperature</th>
+        <th>Humidity</th>
+        <th>Pressure</th>
+        <th>Air Quality</th>
+        <th>Device ID</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of collectedData">
+        <td>{{ item.id }}</td>
+        <td>{{ item.date }}</td>
+        <td>{{ item.time }}</td>
+        <td>{{ item.temperature }}</td>
+        <td>{{ item.humidity }}</td>
+        <td>{{ item.pressure }}</td>
+        <td>{{ item.airQuality }}</td>
+        <td>{{ item.dataCollectionDeviceId }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Mensaje cuando no hay datos -->
+  <div *ngIf="collectedData.length === 0" class="no-data-message">
+    <p style="color:black ;text-align: center;" >No hay datos recolectados hasta el momento.</p>
+  </div>
+</div>
+
+
+  <!-- Modal para Crear Dispositivo -->
+  <!-- Modal para Crear Dispositivo -->
+  <div *ngIf="showCreateModal" class="modal fade show" style="display: block;" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Crear Dispositivo</h5>
+          <button type="button" class="btn-close" (click)="closeModals()"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="name" class="form-label">Nombre:</label>
+              <input type="text" id="name" class="form-control" [(ngModel)]="selectedDevice.name" required />
+            </div>
+            <div class="mb-3">
+              <label for="description" class="form-label">Descripción:</label>
+              <input type="text" id="description" class="form-control" [(ngModel)]="selectedDevice.description"
+                required />
+            </div>
+            <div class="mb-3">
+              <label for="userId" class="form-label">Usuario:</label>
+              <select id="userId" class="form-select" [(ngModel)]="selectedDevice.userId" required>
+                <option value="" disabled selected>Seleccione un usuario</option>
+                <option *ngFor="let user of users" [value]="user.id">{{ user.fullName }}</option>
+              </select>
+            </div>
+
+            <button type="button" class="btn btn-success" (click)="saveDevice()">Crear</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Modal para Editar Dispositivo -->
+  <!-- Modal para Editar Dispositivo -->
+  <div *ngIf="showEditModal" class="modal fade show" style="display: block;" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Dispositivo</h5>
+          <button type="button" class="btn-close" (click)="closeModals()"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="editName" class="form-label">Nombre:</label>
+              <input type="text" id="editName" class="form-control" [(ngModel)]="selectedDevice.name" name="name"
+                required />
+            </div>
+            <div class="mb-3">
+              <label for="editDescription" class="form-label">Descripción:</label>
+              <input type="text" id="editDescription" class="form-control" [(ngModel)]="selectedDevice.description"
+                name="description" required />
+            </div>
+            <div class="mb-3">
+              <label for="userId" class="form-label">Usuario:</label>
+              <select id="userId" class="form-select" [(ngModel)]="selectedDevice.userId" name="userId" required
+                disabled>
+                <option value="" disabled selected>Seleccione un usuario</option>
+                <option *ngFor="let user of users" [value]="user.id">{{ user.fullName }}</option>
+              </select>
+            </div>
+            <button type="button" class="btn btn-success" (click)="saveDevice()">Guardar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Selector para elegir Device ID -->
+
+
+  <!-- Tabla para mostrar los datos recolectados -->
+
+
+</div>
+
+<style>
+  .no-data-message {
+  padding: 15px;
+  background-color: #ffebee; /* Un fondo claro */
+  color: #c62828; /* Un color de texto para el mensaje */
+  border: 1px solid #c62828; /* Borde del mensaje */
+  border-radius: 5px;
+  margin-top: 20px;
+}
+
+  .form-control {
+    color: black;
+    /* Color del texto en los inputs */
+    background-color: white;
+    /* Color de fondo de los inputs */
+  }
+
+  input {
+    color: black;
+    /* Cambia el color del texto dentro de los inputs a negro */
+  }
+
+  .comparison-info {
+    margin: 20px 0;
+    background-color: #e0f7fa;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    color: #006064;
+  }
+
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 16px;
+    text-align: left;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .comparison-table th,
+  .comparison-table td {
+    padding: 10px;
+    border: 1px solid #dddddd;
+  }
+
+  .comparison-table thead tr {
+    background-color: #009879;
+    color: #ffffff;
+  }
+
+  .comparison-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+  }
+
+  .pagination button {
+    margin: 0 5px;
+  }
+
+  .active {
+    background-color: #009879;
+    color: white;
+  }
+
+  .form-select {
+    color: black;
+    /* Asegúrate de que el color del texto sea oscuro */
+  }
+</style>
