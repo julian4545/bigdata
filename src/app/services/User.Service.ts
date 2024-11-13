@@ -9,6 +9,8 @@ import { environment } from '../../environments/environment'; // Asegúrate de q
 export class UserService {
 
   private apiUrl = `${environment.apiUrl}User`;  // Define la URL para el servicio de usuarios
+  
+  private apiUrl2 = `${environment.apiUrl}Sensor`;  // Define la URL para el servicio de usuarios
   private apiUrl1 = `${environment.apiUrl}DataCollectionDevice`; 
 
   constructor(private http: HttpClient) { }
@@ -17,7 +19,9 @@ export class UserService {
   getUsers(): Observable<any> {
     return this.http.get<any>(this.apiUrl);  // Realiza una petición GET para obtener usuarios
   }
-
+  getsensor(): Observable<any> {
+    return this.http.get<any>(this.apiUrl2);  // Realiza una petición GET para obtener usuarios
+  }
   // Método para obtener un usuario por ID
   getUserById(id: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${id}`);  // Petición GET con el ID del usuario

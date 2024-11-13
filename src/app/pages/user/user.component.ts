@@ -7,6 +7,7 @@ import { UserService } from "src/app/services/User.Service";
 })
 export class UserComponent implements OnInit {
   users: any[] = [];
+  users1: any[] = [];
   selectedUser: any = null;
   showModal: boolean = false;
   showCreateModal: boolean = false; // Para mostrar el modal de crear usuario
@@ -16,6 +17,7 @@ export class UserComponent implements OnInit {
 
   ngOnInit() {
     this.getUsers();
+    this.getsensor();
   }
 
   getUsers(): void {
@@ -25,6 +27,16 @@ export class UserComponent implements OnInit {
       },
       error => {
         console.error('Error al obtener usuarios:', error);
+      }
+    );
+  }
+  getsensor(): void {
+    this.userService.getsensor().subscribe(
+      data => {
+        this.users1 = data;
+      },
+      error => {
+        console.error('Error al obtener sensor:', error);
       }
     );
   }
